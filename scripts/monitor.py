@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 """AitoEarn task monitor — scans market, auto-accepts eligible tasks, notifies."""
 
-import os, json, time, smtplib
+import os, sys, time, smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 import requests
+import yaml
+
+# force utf-8 on Windows
+if sys.platform == "win32":
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 
 # ── config ──────────────────────────────────────────────────────────
 API_URL  = "https://aitoearn.cn/api/unified/mcp"
@@ -106,12 +112,12 @@ def main():
             "name": "listTaskMarket",
             "arguments": {"pageNo": page, "pageSize": 20},
         })
-        # MCP tools/call response may nest under content
+        # MCP response wraps result in content[].text as YAML
         items = result
         if isinstance(result, dict) and "content" in result:
             for c in result["content"]:
                 if c.get("type") == "text":
-                    items = json.loads(c["text"])
+                    items = yaml.safe_load(c["text"])
                     break
         for task in items.get("list", []):
             ok, aid = is_eligible(task)
@@ -149,15 +155,15 @@ def main():
     promo_lines = []
     has_promotion = False
     for title, plat, reward, ttype, tid in accepted:
-        lines.append(f"  • {title}  [{', '.join(plat) if isinstance(plat, list) else plat}]  ¥{reward}  ({ttype})")
+        lines.append(f"  - {title}  [{', '.join(plat) if isinstance(plat, list) else plat}]  Y{reward}  ({ttype})")
         lines.append(f"    id: {tid}")
         if ttype == "promotion":
             has_promotion = True
-            promo_lines.append(f"  ⚡ {title} — 需手动发布，请登录 https://aitoearn.cn 完成")
+            promo_lines.append(f"  [!] {title} - 需手动发布，请登录 https://aitoearn.cn 完成")
 
     if has_promotion:
         lines.append("")
-        lines.append("⚠ 以下为推广类任务，需要你登录网页端完成发布：")
+        lines.append("[!] 以下为推广类任务，需要你登录网页端完成发布：")
         lines.extend(promo_lines)
 
     body = "\n".join(lines)
