@@ -86,10 +86,12 @@ def is_eligible(task: dict) -> tuple[bool, str | None]:
     rules     = task.get("acceptRules", {})
     required  = rules.get("fansNum", 0)
 
+    total_fans = sum(a["fans"] for a in ACCOUNTS.values())
+    if total_fans < required:
+        return False, None
+
     for plat in platforms:
-        if plat not in ACCOUNTS:
-            continue
-        if ACCOUNTS[plat]["fans"] >= required:
+        if plat in ACCOUNTS:
             return True, ACCOUNTS[plat]["id"]
 
     return False, None
