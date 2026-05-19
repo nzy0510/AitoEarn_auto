@@ -36,7 +36,7 @@ GitHub Actions (云端，24/7)
 
 | Secret 名称 | 值 |
 |-------------|-----|
-| `AITOEARN_API_KEY` | `ak_uBhWR8xs7hjehQMrxRbmhgin2dJEyiB33DHHuYjzIJ4KIvhR` |
+| `AITOEARN_API_KEY` | 你的 aitoearn API Key（以 `ak_` 开头的那一串） |
 | `QQ_EMAIL` | `1525764737@qq.com` |
 | `QQ_SMTP_AUTH_CODE` | QQ 邮箱 SMTP 授权码（16 位） |
 
