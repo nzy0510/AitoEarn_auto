@@ -2,10 +2,10 @@ name: AitoEarn Task Monitor
 
 on:
   schedule:
-    - cron: "*/10 0 * * *"       # 0:00-0:50 every 10min
-    - cron: "40,50 6 * * *"     # 6:40, 6:50
-    - cron: "*/10 7-23 * * *"   # 7:00-23:50 every 10min
-    # skip 1:00-6:30 UTC
+    - cron: "*/10 0-16 * * *"     # UTC 0:00-16:50 (北京 8:00-0:50)
+    - cron: "40,50 22 * * *"     # UTC 22:40,22:50 (北京 6:40,6:50)
+    - cron: "*/10 23 * * *"      # UTC 23:00-23:50 (北京 7:00-7:50)
+    # skip UTC 17:00-22:30 = 北京凌晨 1:00-6:30
   workflow_dispatch:          # manual trigger for testing
 
 jobs:
