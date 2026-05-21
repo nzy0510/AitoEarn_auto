@@ -128,6 +128,23 @@ def is_eligible(task: dict) -> tuple[bool, str | None]:
     return False, None
 
 
+def get_accepted_task_ids() -> set:
+    """Return set of taskIds the user already accepted (any status)."""
+    ids = set()
+    for status in ("doing", "pending", "approved", "settled", "waiting"):
+        try:
+            text = rpc_text("tools/call", {
+                "name": "listMyUserTasks",
+                "arguments": {"pageNo": 1, "pageSize": 50, "status": status},
+            })
+            data = yaml.safe_load(text)
+            for t in (data.get("list", []) if isinstance(data, dict) else []):
+                ids.add(t.get("taskId"))
+        except Exception:
+            pass
+    return ids
+
+
 # ── content generation ─────────────────────────────────────────────
 
 def generate_content(task: dict, platforms: list[str]) -> dict | None:
@@ -364,8 +381,15 @@ def main():
         print(f"[{time.ctime()}] No eligible tasks.")
         return
 
+    existing_ids = get_accepted_task_ids()
+    print(f"  Existing taskIds: {existing_ids}")
+
     accepted = []  # (title, platforms, reward, ttype, task_id, account_id, user_task_id, full_task)
     for task, aid in eligible:
+        tid = task["id"]
+        if tid in existing_ids:
+            print(f"  [skip] Already accepted: {task['title']}")
+            continue
         tid = task["id"]
         title = task["title"]
         plat = task.get("accountTypes", [])
