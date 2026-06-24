@@ -1,10 +1,7 @@
 name: AitoEarn Task Monitor
 
 on:
-  schedule:
-    - cron: "0,30 0-16 * * *"    # UTC 0:00-16:30 (北京 8:00-0:30)
-    - cron: "0,30 23 * * *"      # UTC 23:00,23:30 (北京 7:00,7:30)
-    # skip UTC 17:00-22:59 = 北京凌晨 1:00-6:59
+  # Automatic schedule is paused. Use workflow_dispatch to run manually.
   workflow_dispatch:          # manual trigger for testing
 
 jobs:
